@@ -1,4 +1,4 @@
-const CACHE = 'fitflow-pwa-v1';
+const CACHE = 'fitflow-pwa-v3';
 const SHELL = [
   './',
   './index.html',

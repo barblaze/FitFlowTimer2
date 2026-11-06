@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0e1116" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0B0F14" />
   <meta name="description" content="FitFlow Timer: intervalos Tabata, EMOM y AMRAP." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>FitFlow Timer</title>
   <link rel="manifest" href="./manifest.webmanifest" />
@@ -14,99 +13,206 @@
   <link rel="stylesheet" href="./css/app.css" />
 </head>
 <body>
+  <div class="app-bg"></div>
+  <div class="header-glow"></div>
   <div id="app" class="app">
-    <header class="topbar">
-      <div class="brand">FitFlow <span>Timer</span></div>
-      <div id="headerBadge" class="badge hidden"></div>
+    <header class="header">
+      <h1 class="app-title">FitFlow Timer</h1>
+      <p class="app-tagline">Entrena por intervalos</p>
     </header>
-    <nav class="tabs" role="tablist" aria-label="Secciones">
-      <button id="tabTraining" class="tab active" type="button">Entrenamiento</button>
-      <button id="tabSettings" class="tab" type="button">Ajustes</button>
+
+    <nav class="tabbar" role="tablist" aria-label="Secciones">
+      <button id="tabTraining" class="tab active" type="button" role="tab" aria-selected="true">
+        <svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+        <span>Entrenamiento</span>
+      </button>
+      <button id="tabSettings" class="tab" type="button" role="tab" aria-selected="false">
+        <svg class="tab-ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+        <span>Ajustes</span>
+      </button>
     </nav>
 
     <main id="viewSetup" class="view">
       <section id="panelTraining" class="panel">
-        <div class="card">
-          <div class="label">Modo</div>
-          <div class="mode-grid">
-            <button class="mode-btn" data-mode="TABATA" type="button"><b>Tabata</b><small>Perfil 1</small></button>
-            <button class="mode-btn" data-mode="EMOM" type="button"><b>EMOM</b><small>Perfil 2</small></button>
-            <button class="mode-btn" data-mode="AMRAP" type="button"><b>AMRAP</b><small>Perfil 3</small></button>
-            <button class="mode-btn" data-mode="CUSTOM" type="button"><b>Personalizado</b><small>Perfil 4</small></button>
+        <div id="coachQuickIndicator" class="coach-indicator hidden"></div>
+
+        <div class="card card-surface">
+          <div class="coach-quick-head">
+            <label class="coach-quick-switch">
+              <span>Avisos por voz</span>
+              <input id="coachQuickSwitch" type="checkbox" class="toggle" />
+            </label>
+          </div>
+          <div id="coachQuickStyles" class="coach-quick-styles hidden">
+            <div class="coach-quick-label">Tipo de entrenador</div>
+            <div class="segmented" role="group" aria-label="Tipo de entrenador">
+              <button type="button" class="seg-btn" data-style="TRAINER">Entrenador</button>
+              <button type="button" class="seg-btn" data-style="FLAITE">Modo Flaite</button>
+              <button type="button" class="seg-btn" data-style="NORMAL">Normal</button>
+              <button type="button" class="seg-btn" data-style="MEMES">Memes</button>
+            </div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="label">Configuración</div>
-          <div class="rows">
-            <div class="row"><span>Preparación</span><div class="stepper"><button type="button" data-step="prep:-5">−</button><button type="button" class="value-btn" id="valPrep" data-edit="prep">00:10</button><button type="button" data-step="prep:5">+</button></div></div>
-            <div class="row"><span>Trabajo</span><div class="stepper"><button type="button" data-step="work:-5">−</button><button type="button" class="value-btn" id="valWork" data-edit="work">00:20</button><button type="button" data-step="work:5">+</button></div></div>
-            <div class="row"><span>Descanso</span><div class="stepper"><button type="button" data-step="rest:-5">−</button><button type="button" class="value-btn" id="valRest" data-edit="rest">00:10</button><button type="button" data-step="rest:5">+</button></div></div>
-            <div class="row"><span>Rondas</span><div class="stepper"><button type="button" data-step="rounds:-1">−</button><span class="value-text" id="valRounds">8</span><button type="button" data-step="rounds:1">+</button></div></div>
-            <div class="row"><span>Ciclos</span><div class="stepper"><button type="button" data-step="cycles:-1">−</button><span class="value-text" id="valCycles">1</span><button type="button" data-step="cycles:1">+</button></div></div>
-            <div class="row"><span>Descanso ciclos</span><div class="stepper"><button type="button" data-step="restCycles:-10">−</button><button type="button" class="value-btn" id="valRestCycles" data-edit="restCycles">00:00</button><button type="button" data-step="restCycles:10">+</button></div></div>
+        <div class="section-label">MODALIDAD</div>
+        <div class="mode-grid">
+          <button class="mode-card" data-mode="TABATA" type="button">
+            <span class="mode-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            <span class="mode-icon-wrap"><svg class="mode-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M13.5 0.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/></svg></span>
+            <span class="mode-title">Perfil 1</span>
+          </button>
+          <button class="mode-card" data-mode="EMOM" type="button">
+            <span class="mode-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            <span class="mode-icon-wrap"><svg class="mode-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></span>
+            <span class="mode-title">Perfil 2</span>
+          </button>
+          <button class="mode-card" data-mode="AMRAP" type="button">
+            <span class="mode-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            <span class="mode-icon-wrap"><svg class="mode-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span>
+            <span class="mode-title">Perfil 3</span>
+          </button>
+          <button class="mode-card" data-mode="CUSTOM" type="button">
+            <span class="mode-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>
+            <span class="mode-icon-wrap"><svg class="mode-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg></span>
+            <span class="mode-title">Perfil 4</span>
+          </button>
+        </div>
+
+        <div class="section-label">PARÁMETROS</div>
+        <div class="card card-surface params-card">
+          <div class="param-row" data-field="prep" data-kind="duration">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"/></svg></span>
+            <span class="param-text"><span class="param-label">Preparación</span><span class="param-unit">seg</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="prep:-5" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><button type="button" class="value-chip" id="valPrep" data-edit="prep">00:10</button><button type="button" class="step-btn" data-step="prep:5" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="param-row" data-field="work" data-kind="duration">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61 1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9a8.994 8.994 0 0 0 7.03-14.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg></span>
+            <span class="param-text"><span class="param-label">Trabajo</span><span class="param-unit">seg</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="work:-5" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><button type="button" class="value-chip" id="valWork" data-edit="work">00:20</button><button type="button" class="step-btn" data-step="work:5" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="param-row" data-field="rest" data-kind="duration">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h12v2H6v-2zm6-17C7.58 2 4 5.58 4 10c0 2.03.76 3.87 2 5.28V17h12v-1.72c1.24-1.41 2-3.25 2-5.28 0-4.42-3.58-8-8-8z"/></svg></span>
+            <span class="param-text"><span class="param-label">Descanso entre rondas</span><span class="param-unit">seg</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="rest:-5" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><button type="button" class="value-chip" id="valRest" data-edit="rest">00:10</button><button type="button" class="step-btn" data-step="rest:5" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="param-row" data-field="rounds" data-kind="count">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg></span>
+            <span class="param-text"><span class="param-label">Rondas</span><span class="param-unit">rondas</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="rounds:-1" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><span class="value-chip readonly" id="valRounds">8</span><button type="button" class="step-btn" data-step="rounds:1" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="param-row" data-field="cycles" data-kind="count">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg></span>
+            <span class="param-text"><span class="param-label">Ciclos</span><span class="param-unit">ciclos</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="cycles:-1" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><span class="value-chip readonly" id="valCycles">1</span><button type="button" class="step-btn" data-step="cycles:1" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
+          </div>
+          <div class="divider"></div>
+          <div class="param-row" data-field="restCycles" data-kind="duration">
+            <span class="param-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg></span>
+            <span class="param-text"><span class="param-label">Descanso entre ciclos</span><span class="param-unit">seg</span></span>
+            <span class="param-ctrl"><button type="button" class="step-btn" data-step="restCycles:-10" aria-label="Disminuir"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13H5v-2h14v2z"/></svg></button><button type="button" class="value-chip" id="valRestCycles" data-edit="restCycles">00:00</button><button type="button" class="step-btn" data-step="restCycles:10" aria-label="Aumentar"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button></span>
           </div>
         </div>
 
-        <div class="card">
-          <div id="summaryMain" class="summary-main"></div>
-          <div id="summaryDetail" class="summary-detail"></div>
-          <div id="summaryWarn" class="summary-warn hidden"></div>
+        <div class="card card-high summary-card">
+          <div class="summary-row">
+            <span class="summary-ic"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></span>
+            <div class="summary-body">
+              <div class="summary-title">DURACIÓN TOTAL</div>
+              <div id="totalText" class="summary-total">--</div>
+              <div id="structureText" class="summary-structure"></div>
+              <div id="warningText" class="summary-warn hidden">Añade descanso entre ciclos o reduce a 1 ciclo para que la sesión tenga pausas claras.</div>
+            </div>
+          </div>
         </div>
-
-        <button id="startBtn" class="primary-btn" type="button">Empezar entrenamiento</button>
       </section>
 
       <section id="panelSettings" class="panel hidden">
-        <div class="card">
-          <div class="label">Sonido</div>
-          <label class="switch-row"><span>Sonido activado</span><input id="setSound" type="checkbox" /></label>
-          <label class="switch-row"><span>Cuenta atrás (3 s)</span><input id="setCountdown" type="checkbox" /></label>
-          <label class="switch-row"><span>Tono inicio trabajo</span><input id="setStartTone" type="checkbox" /></label>
-          <label class="switch-row"><span>Volumen pitidos <output id="setVolumeOut"></output></span><input id="setVolume" type="range" min="0" max="100" step="5" /></label>
-          <button id="testBeepBtn" class="ghost-btn" type="button">Probar sonido</button>
+        <h2 class="panel-title">Ajustes</h2>
+        <p class="panel-sub">Personaliza el sonido y el comportamiento de la app.</p>
+
+        <div class="section-label">SONIDO</div>
+        <div class="card card-surface settings-card">
+          <label class="switch-row"><span>Sonido activado</span><input id="setSound" type="checkbox" class="toggle" /></label>
+          <div class="divider"></div>
+          <label class="switch-row"><span>Cuenta atrás (últimos 3 s)</span><input id="setCountdown" type="checkbox" class="toggle" /></label>
+          <div class="divider"></div>
+          <label class="switch-row"><span>Tono al iniciar fase de trabajo</span><input id="setStartTone" type="checkbox" class="toggle" /></label>
+          <div class="divider"></div>
+          <div class="range-row"><span>Volumen pitidos <output id="setVolumeOut">80%</output></span><input id="setVolume" type="range" min="0" max="100" step="5" /></div>
+          <button id="testBeepBtn" class="ghost-btn" type="button">Probar</button>
         </div>
-        <div class="card">
-          <div class="label">Voz del entrenador</div>
-          <label class="switch-row"><span>Avisos por voz</span><input id="setVoice" type="checkbox" /></label>
+
+        <div class="section-label">VOZ DEL ENTRENADOR</div>
+        <div class="card card-surface settings-card">
+          <label class="switch-row"><span>Avisos por voz</span><input id="setVoice" type="checkbox" class="toggle" /></label>
+          <div class="divider"></div>
           <label class="switch-row"><span>Estilo</span>
-            <select id="setCoachStyle">
+            <select id="setCoachStyle" class="select">
               <option value="TRAINER">Entrenador</option>
               <option value="FLAITE">Modo Flaite</option>
               <option value="NORMAL">Normal</option>
               <option value="MEMES">Memes</option>
             </select>
           </label>
-          <label class="switch-row"><span>Volumen voz <output id="setCoachVolOut"></output></span><input id="setCoachVol" type="range" min="0" max="100" step="5" /></label>
+          <div class="divider"></div>
+          <div class="range-row"><span>Volumen voces <output id="setCoachVolOut">100%</output></span><input id="setCoachVol" type="range" min="0" max="100" step="5" /></div>
           <button id="testVoiceBtn" class="ghost-btn" type="button">Probar voz</button>
-          <div class="hint">Algunos estilos/eventos pueden no tener audio; en ese caso no suenan.</div>
+          <div class="hint">Si falta el audio de un evento/estilo, ese aviso no suena.</div>
         </div>
-        <div class="card">
-          <div class="label">Pantalla y avisos</div>
-          <label class="switch-row"><span>Mantener pantalla encendida</span><input id="setWake" type="checkbox" /></label>
-          <label class="switch-row" id="rowVibrate"><span>Vibración al cambiar fase</span><input id="setVibrate" type="checkbox" /></label>
-          <div id="iosHint" class="hint hidden">En segundo plano/bloqueo el navegador puede pausar audio; al volver la app corrige el tiempo.</div>
+
+        <div class="section-label">PANTALLA Y AVISOS</div>
+        <div class="card card-surface settings-card">
+          <label class="switch-row"><span>Mantener pantalla encendida</span><input id="setWake" type="checkbox" class="toggle" /></label>
+          <div id="rowVibrateWrap"><div class="divider"></div>
+          <label class="switch-row"><span>Vibración al cambiar de fase</span><input id="setVibrate" type="checkbox" class="toggle" /></label></div>
+          <div class="hint">En segundo plano/bloqueo el navegador puede pausar audio; al volver la app corrige el tiempo.</div>
         </div>
       </section>
     </main>
 
+    <div id="startBar" class="start-bar">
+      <button id="startBtn" class="start-btn" type="button">Empezar entrenamiento</button>
+    </div>
+
     <main id="viewWorkout" class="view hidden">
-      <div class="workout" id="workoutRoot">
-        <div class="phase-badge" id="wkPhase">PREPARACIÓN</div>
-        <div class="ring-wrap">
-          <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
-            <circle class="ring-track" cx="110" cy="110" r="96"></circle>
-            <circle class="ring-prog" id="wkRing" cx="110" cy="110" r="96"></circle>
-          </svg>
-          <div class="time-display" id="wkTime">00:10</div>
+      <div id="workoutRoot" class="workout phase-PREPARATION">
+        <div class="wk-backdrop"></div>
+        <div class="wk-topbar">
+          <span class="wk-badge">FITFLOW</span>
+          <span id="wkCoachBadge" class="wk-badge coach hidden"></span>
         </div>
-        <div class="wk-counter" id="wkCounter">Ciclo 1/1 · Ronda 1/8</div>
-        <div class="wk-next" id="wkNext"></div>
-        <div class="wk-log" id="wkLog"></div>
-        <div class="controls">
-          <button id="btnSkip" class="ctrl" type="button">Saltar</button>
-          <button id="btnToggle" class="ctrl primary" type="button">Pausar</button>
-          <button id="btnStop" class="ctrl danger" type="button">Parar</button>
+
+        <div class="wk-center">
+          <div class="ring-wrap" id="ringWrap">
+            <svg class="ring" viewBox="0 0 260 260" aria-hidden="true">
+              <circle class="ring-track" cx="130" cy="130" r="112"></circle>
+              <circle class="ring-prog" id="wkRing" cx="130" cy="130" r="112"></circle>
+            </svg>
+            <div class="ring-inner">
+              <div id="wkPhase" class="wk-phase">PREPARACIÓN</div>
+              <div id="wkTime" class="wk-time">00:10</div>
+              <div id="wkCounter" class="wk-counter">Ciclo 1/1 · Ronda 1/8</div>
+            </div>
+          </div>
+          <div id="wkNext" class="wk-next pill"></div>
+          <div id="wkLog" class="wk-log"></div>
+        </div>
+
+        <div class="wk-controls">
+          <button id="btnToggle" class="btn-primary" type="button">
+            <svg id="icToggle" class="btn-ic" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            <span id="txtToggle">Pausar</span>
+          </button>
+          <button id="btnSkip" class="btn-circle" type="button" aria-label="Saltar">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="m6 18 8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button id="btnStop" class="btn-circle danger" type="button" aria-label="Finalizar">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 6h12v12H6z"/></svg>
+          </button>
         </div>
       </div>
     </main>
@@ -116,15 +222,15 @@
     <form method="dialog" class="dialog-form">
       <h3 id="dlgTitle">Tiempo</h3>
       <div class="dlg-inputs">
-        <label>Min<input id="dlgMin" type="number" min="0" inputmode="numeric" /></label>
-        <span>:</span>
-        <label>Seg<input id="dlgSec" type="number" min="0" max="59" inputmode="numeric" /></label>
+        <label><span class="dlg-lbl">Min</span><input id="dlgMin" type="number" min="0" inputmode="numeric" /></label>
+        <span class="dlg-sep">:</span>
+        <label><span class="dlg-lbl">Seg</span><input id="dlgSec" type="number" min="0" max="59" inputmode="numeric" /></label>
       </div>
-      <div id="dlgPreview" class="dlg-preview"></div>
+      <div id="dlgPreview" class="dlg-preview">00:00</div>
       <div id="dlgError" class="dlg-error"></div>
       <div class="dlg-actions">
-        <button value="cancel" type="submit">Cancelar</button>
-        <button id="dlgOk" value="ok" type="submit" class="primary">Guardar</button>
+        <button value="cancel" type="submit" class="dlg-btn">Cancelar</button>
+        <button id="dlgOk" value="ok" type="submit" class="dlg-btn primary">Guardar</button>
       </div>
     </form>
   </dialog>
