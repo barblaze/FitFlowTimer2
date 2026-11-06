@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e1116" />
+  <meta name="description" content="FitFlow Timer: intervalos Tabata, EMOM y AMRAP." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>FitFlow Timer</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar">
+      <div class="brand">FitFlow <span>Timer</span></div>
+      <div id="headerBadge" class="badge hidden"></div>
+    </header>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button id="tabTraining" class="tab active" type="button">Entrenamiento</button>
+      <button id="tabSettings" class="tab" type="button">Ajustes</button>
+    </nav>
+
+    <main id="viewSetup" class="view">
+      <section id="panelTraining" class="panel">
+        <div class="card">
+          <div class="label">Modo</div>
+          <div class="mode-grid">
+            <button class="mode-btn" data-mode="TABATA" type="button"><b>Tabata</b><small>Perfil 1</small></button>
+            <button class="mode-btn" data-mode="EMOM" type="button"><b>EMOM</b><small>Perfil 2</small></button>
+            <button class="mode-btn" data-mode="AMRAP" type="button"><b>AMRAP</b><small>Perfil 3</small></button>
+            <button class="mode-btn" data-mode="CUSTOM" type="button"><b>Personalizado</b><small>Perfil 4</small></button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="label">Configuración</div>
+          <div class="rows">
+            <div class="row"><span>Preparación</span><div class="stepper"><button type="button" data-step="prep:-5">−</button><button type="button" class="value-btn" id="valPrep" data-edit="prep">00:10</button><button type="button" data-step="prep:5">+</button></div></div>
+            <div class="row"><span>Trabajo</span><div class="stepper"><button type="button" data-step="work:-5">−</button><button type="button" class="value-btn" id="valWork" data-edit="work">00:20</button><button type="button" data-step="work:5">+</button></div></div>
+            <div class="row"><span>Descanso</span><div class="stepper"><button type="button" data-step="rest:-5">−</button><button type="button" class="value-btn" id="valRest" data-edit="rest">00:10</button><button type="button" data-step="rest:5">+</button></div></div>
+            <div class="row"><span>Rondas</span><div class="stepper"><button type="button" data-step="rounds:-1">−</button><span class="value-text" id="valRounds">8</span><button type="button" data-step="rounds:1">+</button></div></div>
+            <div class="row"><span>Ciclos</span><div class="stepper"><button type="button" data-step="cycles:-1">−</button><span class="value-text" id="valCycles">1</span><button type="button" data-step="cycles:1">+</button></div></div>
+            <div class="row"><span>Descanso ciclos</span><div class="stepper"><button type="button" data-step="restCycles:-10">−</button><button type="button" class="value-btn" id="valRestCycles" data-edit="restCycles">00:00</button><button type="button" data-step="restCycles:10">+</button></div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div id="summaryMain" class="summary-main"></div>
+          <div id="summaryDetail" class="summary-detail"></div>
+          <div id="summaryWarn" class="summary-warn hidden"></div>
+        </div>
+
+        <button id="startBtn" class="primary-btn" type="button">Empezar entrenamiento</button>
+      </section>
+
+      <section id="panelSettings" class="panel hidden">
+        <div class="card">
+          <div class="label">Sonido</div>
+          <label class="switch-row"><span>Sonido activado</span><input id="setSound" type="checkbox" /></label>
+          <label class="switch-row"><span>Cuenta atrás (3 s)</span><input id="setCountdown" type="checkbox" /></label>
+          <label class="switch-row"><span>Tono inicio trabajo</span><input id="setStartTone" type="checkbox" /></label>
+          <label class="switch-row"><span>Volumen pitidos <output id="setVolumeOut"></output></span><input id="setVolume" type="range" min="0" max="100" step="5" /></label>
+          <button id="testBeepBtn" class="ghost-btn" type="button">Probar sonido</button>
+        </div>
+        <div class="card">
+          <div class="label">Voz del entrenador</div>
+          <label class="switch-row"><span>Avisos por voz</span><input id="setVoice" type="checkbox" /></label>
+          <label class="switch-row"><span>Estilo</span>
+            <select id="setCoachStyle">
+              <option value="TRAINER">Entrenador</option>
+              <option value="FLAITE">Modo Flaite</option>
+              <option value="NORMAL">Normal</option>
+              <option value="MEMES">Memes</option>
+            </select>
+          </label>
+          <label class="switch-row"><span>Volumen voz <output id="setCoachVolOut"></output></span><input id="setCoachVol" type="range" min="0" max="100" step="5" /></label>
+          <button id="testVoiceBtn" class="ghost-btn" type="button">Probar voz</button>
+          <div class="hint">Algunos estilos/eventos pueden no tener audio; en ese caso no suenan.</div>
+        </div>
+        <div class="card">
+          <div class="label">Pantalla y avisos</div>
+          <label class="switch-row"><span>Mantener pantalla encendida</span><input id="setWake" type="checkbox" /></label>
+          <label class="switch-row" id="rowVibrate"><span>Vibración al cambiar fase</span><input id="setVibrate" type="checkbox" /></label>
+          <div id="iosHint" class="hint hidden">En segundo plano/bloqueo el navegador puede pausar audio; al volver la app corrige el tiempo.</div>
+        </div>
+      </section>
+    </main>
+
+    <main id="viewWorkout" class="view hidden">
+      <div class="workout" id="workoutRoot">
+        <div class="phase-badge" id="wkPhase">PREPARACIÓN</div>
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 220 220" aria-hidden="true">
+            <circle class="ring-track" cx="110" cy="110" r="96"></circle>
+            <circle class="ring-prog" id="wkRing" cx="110" cy="110" r="96"></circle>
+          </svg>
+          <div class="time-display" id="wkTime">00:10</div>
+        </div>
+        <div class="wk-counter" id="wkCounter">Ciclo 1/1 · Ronda 1/8</div>
+        <div class="wk-next" id="wkNext"></div>
+        <div class="wk-log" id="wkLog"></div>
+        <div class="controls">
+          <button id="btnSkip" class="ctrl" type="button">Saltar</button>
+          <button id="btnToggle" class="ctrl primary" type="button">Pausar</button>
+          <button id="btnStop" class="ctrl danger" type="button">Parar</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="timeDialog">
+    <form method="dialog" class="dialog-form">
+      <h3 id="dlgTitle">Tiempo</h3>
+      <div class="dlg-inputs">
+        <label>Min<input id="dlgMin" type="number" min="0" inputmode="numeric" /></label>
+        <span>:</span>
+        <label>Seg<input id="dlgSec" type="number" min="0" max="59" inputmode="numeric" /></label>
+      </div>
+      <div id="dlgPreview" class="dlg-preview"></div>
+      <div id="dlgError" class="dlg-error"></div>
+      <div class="dlg-actions">
+        <button value="cancel" type="submit">Cancelar</button>
+        <button id="dlgOk" value="ok" type="submit" class="primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
