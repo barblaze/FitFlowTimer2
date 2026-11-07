@@ -1,0 +1,8 @@
+{
+  "name": "fitflow-timer-pwa",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:pwa": "node --test tests/pwa.test.mjs tests/coach.test.mjs tests/pwa-assets.test.mjs"
+  }
+}

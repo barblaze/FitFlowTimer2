@@ -1,12 +1,15 @@
 {
+  "id": "./",
   "name": "FitFlow Timer",
   "short_name": "FitFlow",
   "description": "Temporizador de intervalos Tabata, EMOM y AMRAP (PWA).",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0e1116",
-  "theme_color": "#0e1116",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#0B0F14",
+  "theme_color": "#0B0F14",
   "lang": "es",
   "icons": [
     { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

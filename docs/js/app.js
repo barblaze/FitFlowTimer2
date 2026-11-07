@@ -1,10 +1,10 @@
 import { Mode, normalizeConfig, totalSeconds, PhaseType } from './core/model.js';
 import { TimerEngine } from './core/engine.js';
-import { formatMinSec, formatClock, splitSeconds, toSeconds, formatDurationLabel } from './core/format.js';
+import { formatMinSec, formatClock, splitSeconds, toSeconds } from './core/format.js';
 import { loadConfig, saveConfig, loadProfile, loadSettings, saveSettings, CoachStyle } from './store.js';
 import { Beeps, unlockAudio } from './audio/beep.js';
 import { CoachVoice } from './audio/coach.js';
-import { requestWakeLock, releaseWakeLock, setupWakeLockAutoReacquire } from './wake.js';
+import { isWakeLockSupported, requestWakeLock, releaseWakeLock, setupWakeLockAutoReacquire } from './wake.js';
 
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => Array.from(document.querySelectorAll(s));
@@ -211,6 +211,11 @@ function bindSettings() {
   $('#testBeepBtn').addEventListener('click', async () => { await unlockAudio(); Beeps.test(settings.volume); });
   $('#testVoiceBtn').addEventListener('click', async () => { await unlockAudio(); await coach.unlock(); coach.playTest(settings.coachStyle); });
   if (!('vibrate' in navigator)) $('#rowVibrateWrap').classList.add('hidden');
+  if (!isWakeLockSupported()) {
+    $('#rowWakeWrap').classList.add('hidden');
+    const divider = $('#rowVibrateWrap .divider');
+    if (divider) divider.classList.add('hidden');
+  }
 }
 
 function renderSettings() {
@@ -244,10 +249,15 @@ async function startWorkout() {
   lastSecond = -1;
   resyncing = false;
   await unlockAudio();
-  await coach.unlock();
+  if (settings.voiceEnabled) await coach.unlock();
   if (settings.keepScreenOn) await requestWakeLock(true);
   engine = new TimerEngine(config, () => Date.now(), onAnnounce);
   engine.start();
+  const first = engine.currentSegment;
+  if (first && settings.soundEnabled) {
+    if (first.type === PhaseType.WORK && settings.startTone) Beeps.workStart(settings.volume);
+    else if (first.type === PhaseType.REST || first.type === PhaseType.REST_BETWEEN_CYCLES) Beeps.restStart(settings.volume);
+  }
   showView('workout');
   renderCoachQuick();
   renderWorkout(true);
@@ -304,17 +314,21 @@ function tick() {
 
 function handleEngineEvent(ev) {
   if (resyncing) return;
-  if (!settings.soundEnabled) return;
-  if (ev.type === 'Countdown' && settings.countdownBeeps) Beeps.countdown(settings.volume);
-  else if (ev.type === 'HalfTime') Beeps.halfway(settings.volume);
-  else if (ev.type === 'SegmentChanged') {
+  if (ev.type === 'Countdown') {
+    if (settings.soundEnabled && settings.countdownBeeps) Beeps.countdown(settings.volume);
+  } else if (ev.type === 'HalfTime') {
+    if (settings.soundEnabled) Beeps.halfway(settings.volume);
+    maybeVibrate();
+  } else if (ev.type === 'SegmentChanged') {
     const seg = ev.segment;
-    if (seg.type === PhaseType.WORK && settings.startTone) Beeps.workStart(settings.volume);
-    else if (seg.type === PhaseType.REST || seg.type === PhaseType.REST_BETWEEN_CYCLES) Beeps.restStart(settings.volume);
+    if (settings.soundEnabled) {
+      if (seg.type === PhaseType.WORK && settings.startTone) Beeps.workStart(settings.volume);
+      else if (seg.type === PhaseType.REST || seg.type === PhaseType.REST_BETWEEN_CYCLES) Beeps.restStart(settings.volume);
+    }
     maybeVibrate();
     triggerPhaseAnim();
   } else if (ev.type === 'Finished') {
-    Beeps.finished(settings.volume);
+    if (settings.soundEnabled) Beeps.finished(settings.volume);
     maybeVibrate();
   }
 }
@@ -389,6 +403,7 @@ function renderWorkout(phaseAnim) {
 // ---- Visibility/resume ----
 function resyncFromBackground() {
   if (!engine) return;
+  const beforeKey = `${engine.index}:${engine.currentSegment ? engine.currentSegment.type : 'NONE'}:${engine.isFinished}`;
   resyncing = true;
   try {
     coach.clearQueueKeepCurrent();
@@ -397,8 +412,13 @@ function resyncFromBackground() {
     resyncing = false;
   }
   renderWorkout(true);
-  if (engine && !engine.isFinished && engine.currentSegment && settings.voiceEnabled) {
-    const seg = engine.currentSegment;
+  if (!engine || engine.isFinished) {
+    releaseWakeLock();
+    return;
+  }
+  const seg = engine.currentSegment;
+  const afterKey = `${engine.index}:${seg ? seg.type : 'NONE'}:${engine.isFinished}`;
+  if (afterKey !== beforeKey && seg && settings.voiceEnabled) {
     if (seg.type === PhaseType.WORK) coach.playEvent('WorkStarted');
     else if (seg.type === PhaseType.REST || seg.type === PhaseType.REST_BETWEEN_CYCLES) coach.playEvent('RestStarted');
   }
@@ -410,7 +430,7 @@ setupWakeLockAutoReacquire(() => !!engine && !engine.isFinished && settings.keep
 
 // ---- SW ----
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(() => {}); });
 }
 
 // ---- init ----

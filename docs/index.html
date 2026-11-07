@@ -2,10 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0B0F14" />
+  <meta name="color-scheme" content="dark" />
   <meta name="description" content="FitFlow Timer: intervalos Tabata, EMOM y AMRAP." />
   <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FitFlow" />
   <title>FitFlow Timer</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/icons/icon-192.png" type="image/png" />
@@ -166,7 +170,7 @@
 
         <div class="section-label">PANTALLA Y AVISOS</div>
         <div class="card card-surface settings-card">
-          <label class="switch-row"><span>Mantener pantalla encendida</span><input id="setWake" type="checkbox" class="toggle" /></label>
+          <div id="rowWakeWrap"><label class="switch-row"><span>Mantener pantalla encendida</span><input id="setWake" type="checkbox" class="toggle" /></label></div>
           <div id="rowVibrateWrap"><div class="divider"></div>
           <label class="switch-row"><span>Vibración al cambiar de fase</span><input id="setVibrate" type="checkbox" class="toggle" /></label></div>
           <div class="hint">En segundo plano/bloqueo el navegador puede pausar audio; al volver la app corrige el tiempo.</div>

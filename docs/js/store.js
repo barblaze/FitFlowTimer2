@@ -22,15 +22,23 @@ export function defaultSettings() {
   };
 }
 
-const KEY_CONFIG = 'config';
-const KEY_SETTINGS = 'settings';
-const profileKey = (mode) => `profile_${mode}`;
+const KEY_CONFIG = 'fitflow.config';
+const KEY_SETTINGS = 'fitflow.settings';
+const profileKey = (mode) => `fitflow.profile_${mode}`;
+const legacyProfileKey = (mode) => `profile_${mode}`;
 
 function safeGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }
 }
 function safeSet(key, value) {
   try { localStorage.setItem(key, value); } catch {}
+}
+function safeGetMigrated(key, legacyKey) {
+  const value = safeGet(key);
+  if (value !== null) return value;
+  const legacy = safeGet(legacyKey);
+  if (legacy !== null) safeSet(key, legacy);
+  return legacy;
 }
 
 export function saveConfig(config) {
@@ -42,11 +50,12 @@ export function saveConfig(config) {
 }
 
 export function loadConfig() {
-  const raw = safeGet(KEY_CONFIG);
+  const raw = safeGetMigrated(KEY_CONFIG, 'config');
   if (!raw) return normalizeConfig();
   try {
     const c = normalizeConfig(JSON.parse(raw));
-    if (!safeGet(profileKey(c.mode))) safeSet(profileKey(c.mode), JSON.stringify(c));
+    const profileRaw = safeGetMigrated(profileKey(c.mode), legacyProfileKey(c.mode));
+    if (!profileRaw) safeSet(profileKey(c.mode), JSON.stringify(c));
     return c;
   } catch {
     return normalizeConfig();
@@ -55,7 +64,7 @@ export function loadConfig() {
 
 export function loadProfile(mode) {
   const m = Mode[mode] ? mode : Mode.TABATA;
-  const raw = safeGet(profileKey(m));
+  const raw = safeGetMigrated(profileKey(m), legacyProfileKey(m));
   if (!raw) return preset(m);
   try {
     return normalizeConfig({ ...JSON.parse(raw), mode: m });
@@ -71,7 +80,7 @@ export function saveSettings(settings) {
 }
 
 export function loadSettings() {
-  const raw = safeGet(KEY_SETTINGS);
+  const raw = safeGetMigrated(KEY_SETTINGS, 'settings');
   if (!raw) return defaultSettings();
   try {
     return normalizeSettings(JSON.parse(raw));

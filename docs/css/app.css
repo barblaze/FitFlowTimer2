@@ -11,9 +11,9 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;background:var(--background);color:var(--text-primary);
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
-body{min-height:100dvh;overflow-x:hidden}
+body{min-height:100vh;min-height:100dvh;overflow-x:hidden;overscroll-behavior-y:contain}
 button,input,select{font:inherit;color:inherit}
-button{cursor:pointer}
+button{cursor:pointer;touch-action:manipulation}
 .hidden{display:none !important}
 
 .app-bg{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,var(--background),var(--background-alt) 45%,var(--background))}
@@ -117,7 +117,7 @@ button{cursor:pointer}
 .hint{font-size:12px;color:var(--text-muted);padding:4px 0 12px;line-height:1.35}
 
 /* Workout */
-#viewWorkout{position:fixed;inset:0;z-index:30;background:var(--background)}
+#viewWorkout{position:fixed;inset:0;height:100vh;height:100dvh;z-index:30;background:var(--background);overscroll-behavior:none}
 #viewWorkout.hidden{display:none !important}
 .workout{position:relative;height:100%;display:flex;flex-direction:column;padding:calc(8px + var(--safe-t)) 20px calc(12px + var(--safe-b));overflow:hidden}
 .wk-backdrop{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:1;transition:background .4s ease}
@@ -133,11 +133,12 @@ button{cursor:pointer}
 .wk-badge.coach{letter-spacing:.08em;font-size:10px}
 
 .wk-center{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:0}
-.ring-wrap{position:relative;width:min(78vw,320px);height:min(78vw,320px);display:flex;align-items:center;justify-content:center}
+.ring-wrap{position:relative;width:min(78vw,56vh,320px);height:min(78vw,56vh,320px);display:flex;align-items:center;justify-content:center}
 .ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
 .ring-track{fill:none;stroke:var(--track);stroke-width:12}
 .ring-prog{fill:none;stroke:var(--phase-prep);stroke-width:12;stroke-linecap:round;
   stroke-dasharray:703.72;stroke-dashoffset:703.72;transition:stroke-dashoffset .12s linear, stroke .25s ease;
+  filter:drop-shadow(0 0 6px var(--phase-color, var(--phase-prep)));
   filter:drop-shadow(0 0 6px color-mix(in srgb, var(--phase-color, var(--phase-prep)) 55%, transparent))}
 .phase-PREPARATION{--phase-color:var(--phase-prep)} .phase-WORK{--phase-color:var(--phase-work)}
 .phase-REST{--phase-color:var(--phase-rest)} .phase-REST_BETWEEN_CYCLES{--phase-color:var(--phase-cycle)} .phase-FINISHED{--phase-color:var(--brand)}
@@ -146,7 +147,7 @@ button{cursor:pointer}
 .wk-phase{font-size:16px;font-weight:800;letter-spacing:.12em;color:var(--phase-color);transition:color .25s, opacity .2s, transform .2s}
 .wk-phase.enter{animation:phaseIn .26s ease}
 @keyframes phaseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.wk-time{font-size:clamp(3.4rem,16vw,5.2rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.01em;line-height:1.05;color:var(--phase-color);margin-top:2px;transition:color .25s}
+.wk-time{font-size:clamp(3.4rem,min(16vw,10vh),5.2rem);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.01em;line-height:1.05;color:var(--phase-color);margin-top:2px;transition:color .25s}
 .wk-time.pulse{animation:timePulse .32s ease}
 @keyframes timePulse{0%{transform:scale(1)}45%{transform:scale(1.085)}100%{transform:scale(1)}}
 .ring-wrap.pulse-ring{animation:ringPulse .28s ease}
@@ -170,7 +171,8 @@ button{cursor:pointer}
 .btn-circle:disabled{opacity:.45}
 .btn-circle:active:not(:disabled){transform:scale(.97)}
 
-dialog{border:1px solid var(--outline);border-radius:22px;background:var(--surface);color:var(--text-primary);padding:0;max-width:360px;width:calc(100% - 40px)}
+dialog{border:1px solid var(--outline);border-radius:22px;background:var(--surface);color:var(--text-primary);padding:0;max-width:360px;width:calc(100% - 40px);
+  max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 .dialog-form{padding:18px}
 .dialog-form h3{margin:0 0 14px;font-size:18px}
@@ -186,6 +188,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .dlg-btn.primary{background:var(--brand);color:var(--background);border-color:transparent}
 
 @media (max-width:360px){.app{padding-left:14px;padding-right:14px}.value-chip{min-width:56px;font-size:15px}.wk-time{font-size:3rem}}
+@media (max-height:520px){.wk-topbar{padding-top:0}.wk-center{gap:4px}.wk-controls{padding-top:4px}.wk-counter{margin-top:2px}}
+@media (pointer:coarse){.step-btn{width:44px;height:44px}.value-chip{height:46px}.seg-btn{padding-top:12px;padding-bottom:12px}}
 @media (prefers-reduced-motion: reduce){
   .ring-prog,.wk-time.pulse,.wk-phase.enter,.ring-wrap.pulse-ring,.mode-card,.toggle,.toggle::after{transition:none;animation:none}
 }

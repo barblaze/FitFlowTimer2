@@ -11,8 +11,13 @@ const CANDIDATES = {
   SessionFinished: ['session_finished', 'session_finish'],
 };
 
-const EXTS = ['.ogg', '.mp3', '.m4a']; // prefer ogg (Mozilla), fallbacks for compatibility
+const EXTS_DEFAULT = ['.ogg'];
+const EXTS_MEMES = ['.mp3', '.ogg'];
 const styleFolders = { TRAINER: 'entrenador', FLAITE: 'flaite', NORMAL: 'normal', MEMES: 'memes' };
+
+export function extensionsForFolder(folder) {
+  return folder === 'memes' ? EXTS_MEMES : EXTS_DEFAULT;
+}
 
 export class CoachVoice {
   constructor() {
@@ -25,18 +30,29 @@ export class CoachVoice {
   }
 
   setStyle(style) { this.style = styleFolders[style] ? style : 'TRAINER'; }
-  setVolume(v) { this.volume = Math.max(0, Math.min(1, Number(v) || 0)); }
+  setVolume(v) {
+    this.volume = Math.max(0, Math.min(1, Number(v) || 0));
+    const a = this.current && this.current.urlAudio;
+    if (a) {
+      a.volume = this.volume;
+      a.muted = this.volume <= 0;
+    }
+  }
   setEnabled(v) { this.enabled = !!v; if (!v) this.stopAll(); }
 
   async unlock() {
     if (this._unlocked) return true;
+    this._unlocked = true;
     try {
       const a = new Audio();
       a.muted = true;
-      a.src = 'data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAA'; // tiny silent-ish stub; play may still fail, fine
-      await a.play().catch(() => {});
-      a.pause();
-      this._unlocked = true;
+      a.preload = 'auto';
+      a.src = BASE + 'entrenador/work_started.ogg';
+      a.play().catch(() => {});
+      const timer = setTimeout(() => {
+        try { a.pause(); a.removeAttribute('src'); a.load(); } catch {}
+      }, 1500);
+      if (timer && typeof timer.unref === 'function') timer.unref();
     } catch {}
     return true;
   }
@@ -51,7 +67,8 @@ export class CoachVoice {
 
   playTest(style) {
     const folder = styleFolders[style] || 'entrenador';
-    this.enqueueNames(folder, CANDIDATES.SessionStarting, true);
+    this.stopAll();
+    this.enqueueNames(folder, CANDIDATES.WorkStarted, true);
   }
 
   enqueueNames(folder, names, force) {
@@ -66,19 +83,20 @@ export class CoachVoice {
     if (this.current || !this.queue.length) return;
     const item = this.queue.shift();
     this.current = item;
-    const ok = await this._playItem(item);
-    if (!ok) {
-      this.current = null;
-      this._drain();
-    }
+    await this._playItem(item);
+    if (this.current !== item) return;
+    this.current = null;
+    this._drain();
   }
 
   async _playItem(item) {
     // Try candidates in order; Audio.canPlayType not definitive for ogg path resolution here, so attempt load/play.
     for (const name of item.names) {
-      for (const ext of EXTS) {
+      for (const ext of extensionsForFolder(item.folder)) {
+        if (this.current !== item) return false;
         const url = BASE + encodeURIComponent(item.folder) + '/' + encodeURIComponent(name + ext);
         const played = await this._tryUrl(url);
+        if (this.current !== item) return false;
         if (played) return true;
       }
     }
@@ -88,32 +106,50 @@ export class CoachVoice {
   _tryUrl(url) {
     return new Promise((resolve) => {
       let settled = false;
-      const done = (v) => { if (settled) return; settled = true; cleanup(); resolve(v); };
+      let loadTimer = null;
       const a = new Audio();
-      a.preload = 'auto';
-      const vol = this.volume <= 0 ? 1.0 : this.volume;
-      a.volume = Math.max(0, Math.min(1, vol));
-      const cleanup = () => {
-        a.onended = a.onerror = a.onabort = a.onstalled = null;
+      const release = () => {
+        try { a.pause(); a.removeAttribute('src'); a.load(); } catch {}
       };
-      a.onended = () => { if (this.current && this.current.urlAudio === a) this.current = null; done(true); this._drain(); };
+      const cleanup = () => {
+        if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+        a.onended = a.onerror = a.onabort = a.onstalled = a.onplaying = null;
+      };
+      const done = (value) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        if (this.current && this.current.urlAudio === a) this.current.urlAudio = null;
+        release();
+        resolve(value);
+      };
+      a.preload = 'auto';
+      a.volume = Math.max(0, Math.min(1, Number(this.volume)));
+      a.muted = this.volume <= 0;
+      a.onended = () => done(true);
       a.onerror = () => done(false);
       a.onabort = () => done(false);
-      // Attach so we can check identity; also store on item
+      a.onplaying = () => {
+        if (loadTimer) { clearTimeout(loadTimer); loadTimer = null; }
+      };
       if (this.current) this.current.urlAudio = a;
+      loadTimer = setTimeout(() => done(false), 6000);
+      if (loadTimer && typeof loadTimer.unref === 'function') loadTimer.unref();
       a.src = url;
-      a.play().then(() => {
-        // playing; onended will resolve true
-      }).catch(() => done(false));
-      // Safety timeout in case load hangs on missing asset with odd server behavior
-      setTimeout(() => { if (!settled) { try { a.pause(); } catch {} done(false); } }, 12000);
+      a.play().catch(() => done(false));
     });
   }
 
   stopAll() {
     this.queue = [];
     try {
-      if (this.current && this.current.urlAudio) { this.current.urlAudio.pause(); this.current.urlAudio.src = ''; }
+      const a = this.current && this.current.urlAudio;
+      if (a) {
+        this.current.urlAudio = null;
+        a.pause();
+        a.removeAttribute('src');
+        a.load();
+      }
     } catch {}
     this.current = null;
   }

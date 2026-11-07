@@ -139,7 +139,7 @@ export class TimerEngine {
       : (this.segmentEndMs + (seg.durationSeconds * 1000));
     this.lastWholeSecond = -1;
     this.halfwayFired = false;
-    if (previous && seg.type === PhaseType.WORK && seg.cycle > previous.cycle) {
+    if (previous && previous.cycle >= 1 && seg.type === PhaseType.WORK && seg.cycle > previous.cycle) {
       this.announcer({ type: 'CycleFinished', cycle: previous.cycle });
     }
     if (seg.type === PhaseType.WORK) {

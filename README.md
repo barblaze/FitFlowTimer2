@@ -3,13 +3,25 @@
 Temporizador de intervalos **Tabata / EMOM / AMRAP** para Android. La APK se compila y
 firma automaticamente en **GitHub Actions** (workflow `.github/workflows/build-apk.yml`).
 
+## PWA (navegadores)
+
+La misma app esta disponible como PWA en `docs/` y se publica con GitHub Pages:
+**https://barblaze.github.io/FitFlowTimer2/**
+
+- Compatible con Chrome, Edge y Samsung Internet en Android, y con Firefox Android.
+- Instalable en Chromium Android; Firefox Android permite anadirla a la pantalla de inicio.
+- Funciona offline con el shell y los audios del entrenador precargados.
+- La voz del entrenador usa Ogg nativo en Chrome/Firefox Android; el estilo Memes usa MP3.
+- Verificacion local: `cd docs && python3 -m http.server 4173`.
+- iOS/Safari queda fuera de alcance: WebKit no reproduce Ogg nativamente y esta version no incluye decodificador.
+
 ## Funcionalidades
 
 - Configurables: tiempo de preparacion, tiempo de trabajo, descanso entre rondas,
   numero de rondas, numero de ciclos y descanso entre ciclos.
 - Presets: **Tabata** (10 / 20 / 10 x 8), **EMOM** (10 / 40 / 20 x 10, ronda de 60 s)
   y **AMRAP** (10 / 600 x 1), mas modo "A medida".
-- **Pitido de cuenta atras en los ultimos 5 segundos** de la preparacion y de cada
+- **Pitido de cuenta atras en los ultimos 3 segundos** de la preparacion y de cada
   descanso entre rondas, con tonos diferenciados para inicio de trabajo y fin de sesion.
 - **Compatible con la musica**: la app nunca pide foco de audio, por lo que Spotify,
   YouTube o cualquier otra app siguen sonando sin pausarse ni atenuarse.
