@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { CoachVoice, extensionsForFolder } from '../docs/js/audio/coach.js';
+import { CoachVoice, extensionsForFolder, canPlayOggNative, needsOggDecoder } from '../docs/js/audio/coach.js';
 
 class FakeAudio {
   static instances = [];
@@ -43,6 +43,37 @@ test('coach: memes usa mp3 primero y los demas estilos usan ogg', () => {
   assert.deepEqual(extensionsForFolder('entrenador'), ['.ogg']);
   assert.deepEqual(extensionsForFolder('flaite'), ['.ogg']);
   assert.deepEqual(extensionsForFolder('normal'), ['.ogg']);
+});
+
+test('coach: usa stb-vorbis solo cuando Ogg no es nativo', () => {
+  try {
+    globalThis.document = { createElement: () => ({ canPlayType: () => '' }) };
+    assert.equal(canPlayOggNative(), false);
+    assert.equal(needsOggDecoder('https://example.test/work_started.ogg'), true);
+    assert.equal(needsOggDecoder('https://example.test/work_started.mp3'), false);
+
+    globalThis.document = { createElement: () => ({ canPlayType: () => 'probably' }) };
+    assert.equal(canPlayOggNative(), true);
+    assert.equal(needsOggDecoder('https://example.test/work_started.ogg'), false);
+  } finally {
+    delete globalThis.document;
+  }
+});
+
+test('coach: iOS usa el decoder aunque canPlayType sea ambiguo', () => {
+  const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  try {
+    Object.defineProperty(globalThis, 'navigator', {
+      value: { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', platform: 'iPhone', maxTouchPoints: 5 },
+      configurable: true,
+      enumerable: true,
+    });
+    globalThis.document = { createElement: () => ({ canPlayType: () => 'maybe' }) };
+    assert.equal(needsOggDecoder('https://example.test/work_started.ogg'), true);
+  } finally {
+    delete globalThis.document;
+    if (navigatorDescriptor) Object.defineProperty(globalThis, 'navigator', navigatorDescriptor);
+  }
 });
 
 test('coach: unlock usa un Ogg real muteado', async () => {

@@ -8,12 +8,12 @@ firma automaticamente en **GitHub Actions** (workflow `.github/workflows/build-a
 La misma app esta disponible como PWA en `docs/` y se publica con GitHub Pages:
 **https://barblaze.github.io/FitFlowTimer2/**
 
-- Compatible con Chrome, Edge y Samsung Internet en Android, y con Firefox Android.
+- Compatible con Chrome, Edge y Samsung Internet en Android, Firefox Android e iOS/Safari.
 - Instalable en Chromium Android; Firefox Android permite anadirla a la pantalla de inicio.
 - Funciona offline con el shell y los audios del entrenador precargados.
-- La voz del entrenador usa Ogg nativo en Chrome/Firefox Android; el estilo Memes usa MP3.
+- La voz del entrenador usa Ogg nativo en Chrome/Firefox Android; en iOS/Safari se
+  decodifica con `stb-vorbis` (WASM). El estilo Memes usa MP3.
 - Verificacion local: `cd docs && python3 -m http.server 4173`.
-- iOS/Safari queda fuera de alcance: WebKit no reproduce Ogg nativamente y esta version no incluye decodificador.
 
 ## Funcionalidades
 
@@ -83,3 +83,10 @@ razonable (aprox. -14 LUFS).
 Cada estilo solo reproduce los archivos de **su propia carpeta**. Si eliges Entrenador y
 falta `rest_started.ogg` en `coach/entrenador/`, ese aviso no suena, aunque exista en
 `flaite`, `normal` o `memes`.
+
+## Creditos
+
+La PWA incluye una copia vendorizada de
+[`stb-vorbis`](https://github.com/spessasus/stb-vorbis) v0.0.7 (Apache-2.0) para
+decodificar Ogg Vorbis en navegadores sin soporte nativo, principalmente iOS/WebKit.
+La licencia esta en `docs/js/vendor/stb-vorbis.LICENSE`.

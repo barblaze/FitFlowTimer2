@@ -1,4 +1,4 @@
-const CACHE = 'fitflow-pwa-v5';
+const CACHE = 'fitflow-pwa-v6';
 const SHELL = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const SHELL = [
   './js/core/format.js',
   './js/audio/beep.js',
   './js/audio/coach.js',
+  './js/vendor/stb-vorbis.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/icon-192-maskable.png',

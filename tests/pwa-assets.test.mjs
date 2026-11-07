@@ -30,10 +30,11 @@ function pngSize(file) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
-test('sw: cache v5 y todos los assets del SHELL existen', () => {
-  assert.match(sw, /const CACHE = 'fitflow-pwa-v5';/);
+test('sw: cache v6 y todos los assets del SHELL existen', () => {
+  assert.match(sw, /const CACHE = 'fitflow-pwa-v6';/);
   const entries = shellEntries();
   assert.ok(entries.includes('./assets/coach/memes/work_started.mp3'));
+  assert.ok(entries.includes('./js/vendor/stb-vorbis.js'));
 
   for (const entry of entries) {
     const file = entry === './' ? join(docs, 'index.html') : join(docs, entry.replace(/^\.\//, ''));

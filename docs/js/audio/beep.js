@@ -2,7 +2,7 @@ let ctx = null;
 
 export function getAudioContext() {
   if (ctx) return ctx;
-  const AC = window.AudioContext || window.webkitAudioContext;
+  const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return null;
   ctx = new AC();
   return ctx;

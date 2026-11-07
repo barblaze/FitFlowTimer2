@@ -14,33 +14,38 @@ PWA estatica servible desde `docs/` (GitHub Pages).
   offline, aunque no muestra el banner de instalacion de Chromium.
 - El service worker usa red primero para la navegacion y `stale-while-revalidate`
   para JS/CSS, de modo que los cambios llegan en la siguiente carga.
-- La cache `fitflow-pwa-v5` precarga el shell, los iconos y los audios del entrenador,
-  asi que la app arranca offline y la voz tambien funciona sin red.
+- La cache `fitflow-pwa-v6` precarga el shell, los iconos, los audios del entrenador y
+  el decodificador `stb-vorbis`, asi que la app arranca offline y la voz tambien
+  funciona sin red, incluido iOS.
 - El registro usa `updateViaCache: 'none'` para detectar antes las actualizaciones del
   service worker.
 
 ## Uso en navegadores
-- Objetivo soportado: **Chrome/Edge/Samsung Android y Firefox Android**.
+- Objetivo soportado: **Chrome/Edge/Samsung Android, Firefox Android e iOS/Safari**.
 - Abrir la URL y pulsar “Empezar entrenamiento” para desbloquear el audio.
 - La voz del entrenador usa los `.ogg` de `assets/coach/`, que Chrome y Firefox
-  reproducen de forma nativa en Android. El estilo Memes usa su `work_started.mp3`.
+  reproducen de forma nativa en Android. En iOS/Safari se decodifican con
+  `stb-vorbis` (WASM) y se reproducen por Web Audio. El estilo Memes usa su
+  `work_started.mp3`.
 - Si falta un clip para un evento/estilo, ese evento queda en silencio (sin mezclar
   estilos).
 
 ## Limitaciones web
 - En segundo plano/pantalla bloqueada el navegador puede suspender timers y audio. Al
   volver, el tiempo se recalcula por marcas de tiempo (sin reproducir rafagas de avisos).
-- **iOS/Safari queda fuera de alcance**: WebKit no reproduce Ogg nativamente y esta
-  version no incluye decodificador. En iOS la voz no suena; los pitidos y el
-  temporizador si funcionan.
+- En iOS/Safari la primera reproduccion de cada clip Ogg decodifica WASM y puede tardar
+  unos cientos de milisegundos; despues queda en cache en memoria. El decodificador y
+  los audios se precargan para uso offline.
 - Vibracion solo si `navigator.vibrate` esta disponible; en caso contrario la opcion
   se oculta.
 - “Mantener pantalla encendida” usa Screen Wake Lock API cuando esta disponible
   (contexto seguro). Si el navegador no la soporta, la opcion se oculta.
 
-## Checklist manual (Android)
+## Checklist manual (Android e iOS)
 - Chrome: instalar, abrir offline, probar voz Ogg, pitidos, volumen y silencio.
 - Firefox: “Anadir a pantalla de inicio”, abrir offline y probar la voz Ogg.
+- iOS/Safari: probar voz Ogg tras la primera carga, comprobar que el decodificador
+  quedo cacheado y repetir la prueba offline.
 - Bloquear la pantalla o cambiar de app durante un entrenamiento y volver: el tiempo
   debe corregirse sin reproducir avisos atrasados.
 - Probar estilo Memes (MP3) y Entrenador/Flaite/Normal (Ogg).
@@ -57,3 +62,8 @@ python3 -m http.server 4173
 ```bash
 npm run test:pwa
 ```
+
+## Creditos
+
+Decoder Ogg para iOS: [`stb-vorbis`](https://github.com/spessasus/stb-vorbis)
+v0.0.7, Apache-2.0. Licencia en `js/vendor/stb-vorbis.LICENSE`.

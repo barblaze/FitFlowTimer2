@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test:pwa": "node --test tests/pwa.test.mjs tests/coach.test.mjs tests/pwa-assets.test.mjs"
+    "test:pwa": "node --test tests/pwa.test.mjs tests/coach.test.mjs tests/coach-decoder.test.mjs tests/pwa-assets.test.mjs tests/ogg-decoder.test.mjs"
   }
 }
