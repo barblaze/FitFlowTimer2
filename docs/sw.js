@@ -1,4 +1,4 @@
-const CACHE = 'fitflow-pwa-v6';
+const CACHE = 'fitflow-pwa-v7';
 const SHELL = [
   './',
   './index.html',
@@ -30,7 +30,8 @@ const SHELL = [
   './assets/coach/normal/halftime.ogg',
   './assets/coach/normal/rest_started.ogg',
   './assets/coach/normal/session_finished.ogg',
-  './assets/coach/memes/work_started.mp3'
+  './assets/coach/memes/work_started.mp3',
+  './assets/coach/memes/session_finished.ogg'
 ];
 const NETWORK_TIMEOUT_MS = 3500;
 const PRECACHE_TIMEOUT_MS = 8000;

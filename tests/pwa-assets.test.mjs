@@ -30,10 +30,11 @@ function pngSize(file) {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 }
 
-test('sw: cache v6 y todos los assets del SHELL existen', () => {
-  assert.match(sw, /const CACHE = 'fitflow-pwa-v6';/);
+test('sw: cache v7 y todos los assets del SHELL existen', () => {
+  assert.match(sw, /const CACHE = 'fitflow-pwa-v7';/);
   const entries = shellEntries();
   assert.ok(entries.includes('./assets/coach/memes/work_started.mp3'));
+  assert.ok(entries.includes('./assets/coach/memes/session_finished.ogg'));
   assert.ok(entries.includes('./js/vendor/stb-vorbis.js'));
 
   for (const entry of entries) {
@@ -48,7 +49,7 @@ test('sw: todos los audios del entrenador estan precargados', () => {
     .map((file) => './' + relative(docs, file).split('\\').join('/'))
     .filter((file) => /\.(ogg|mp3)$/i.test(file));
 
-  assert.equal(audioFiles.filter((file) => file.endsWith('.ogg')).length, 11);
+  assert.equal(audioFiles.filter((file) => file.endsWith('.ogg')).length, 12);
   for (const file of audioFiles) {
     assert.ok(entries.has(file), `Audio sin precachear: ${file}`);
   }

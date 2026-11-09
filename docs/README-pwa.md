@@ -14,7 +14,7 @@ PWA estatica servible desde `docs/` (GitHub Pages).
   offline, aunque no muestra el banner de instalacion de Chromium.
 - El service worker usa red primero para la navegacion y `stale-while-revalidate`
   para JS/CSS, de modo que los cambios llegan en la siguiente carga.
-- La cache `fitflow-pwa-v6` precarga el shell, los iconos, los audios del entrenador y
+- La cache `fitflow-pwa-v7` precarga el shell, los iconos, los audios del entrenador y
   el decodificador `stb-vorbis`, asi que la app arranca offline y la voz tambien
   funciona sin red, incluido iOS.
 - El registro usa `updateViaCache: 'none'` para detectar antes las actualizaciones del
@@ -26,7 +26,7 @@ PWA estatica servible desde `docs/` (GitHub Pages).
 - La voz del entrenador usa los `.ogg` de `assets/coach/`, que Chrome y Firefox
   reproducen de forma nativa en Android. En iOS/Safari se decodifican con
   `stb-vorbis` (WASM) y se reproducen por Web Audio. El estilo Memes usa su
-  `work_started.mp3`.
+  `work_started.mp3` y `session_finished.ogg`.
 - Si falta un clip para un evento/estilo, ese evento queda en silencio (sin mezclar
   estilos).
 
@@ -48,7 +48,7 @@ PWA estatica servible desde `docs/` (GitHub Pages).
   quedo cacheado y repetir la prueba offline.
 - Bloquear la pantalla o cambiar de app durante un entrenamiento y volver: el tiempo
   debe corregirse sin reproducir avisos atrasados.
-- Probar estilo Memes (MP3) y Entrenador/Flaite/Normal (Ogg).
+- Probar estilo Memes (MP3/Ogg) y Entrenador/Flaite/Normal (Ogg).
 - Rotar el dispositivo y comprobar que el anillo y los controles siguen visibles.
 
 ## Verificacion local
